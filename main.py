@@ -16,16 +16,16 @@ def modificar():
         data = request.get_json()
 
         wb = load_workbook("PlanDeRetiroInstrucciones.xlsx")
-        ws = wb.active
+        ws = wb["Plan de Retiro"]  # Abrimos la hoja correcta
 
-        # Cambia estas celdas según el Excel original y tus necesidades
-        ws["C1"] = data.get("edad_actual")
-        ws["C2"] = data.get("edad_retiro")
-        ws["C3"] = data.get("ingreso_anual")
-        ws["C4"] = data.get("activo_financiero")
-        ws["C5"] = data.get("tasa_interes")
-        ws["C6"] = data.get("fraccion_ahorro")
-        ws["C7"] = data.get("nombre_persona")
+        # Escribir datos en las celdas específicas:
+        ws["C2"] = data.get("edad_actual")
+        ws["C3"] = data.get("edad_retiro")
+        ws["C4"] = data.get("ingreso_anual")
+        ws["C8"] = data.get("activo_financiero")
+        ws["C10"] = data.get("tasa_interes")
+        ws["C12"] = data.get("fraccion_ahorro")      # Cambia si prefieres otra celda
+        ws["C14"] = data.get("nombre_persona")       # Cambia si prefieres otra celda
 
         output_file = "downloads/PlanModificado.xlsx"
         os.makedirs("downloads", exist_ok=True)
