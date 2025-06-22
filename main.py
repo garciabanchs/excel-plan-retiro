@@ -24,14 +24,15 @@ def modificar():
         ws_plan["C3"] = data.get("edad_retiro")
         ws_plan["C4"] = data.get("ingreso_anual")
         ws_plan["C5"] = data.get("activo_financiero")
-        # La tasa de interés debe ir en C8 y debe ser decimal (7% → 0.07)
+
+        # Convertir tasa de interés (%) a decimal para Excel (e.g. 8 -> 0.08)
         tasa_interes = data.get("tasa_interes")
         if tasa_interes is not None:
             ws_plan["C8"] = tasa_interes / 100
         else:
             ws_plan["C8"] = None
 
-        # Fracción del ingreso a ahorrar va en C10, también decimal (15% → 0.15)
+        # Convertir fracción del ingreso a ahorrar (%) a decimal para Excel (e.g. 12 -> 0.12)
         fraccion_ahorro = data.get("fraccion_ahorro")
         if fraccion_ahorro is not None:
             ws_plan["C10"] = fraccion_ahorro / 100
