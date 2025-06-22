@@ -1,4 +1,3 @@
-import logging
 from flask import Flask, request, send_file, jsonify
 from flask_cors import CORS
 from openpyxl import load_workbook
@@ -7,16 +6,7 @@ import requests
 from io import BytesIO
 import os
 import traceback
-
-# Configuración de logging a consola y archivo
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s %(levelname)s %(message)s',
-    handlers=[
-        logging.StreamHandler(),
-        logging.FileHandler("error.log", mode='a', encoding='utf-8')
-    ]
-)
+import logging
 
 app = Flask(__name__)
 CORS(app)
@@ -31,10 +21,8 @@ def modificar():
         data = request.get_json()
         logging.debug(f"Datos recibidos: {data}")
 
-        logging.debug("Cargando archivo Excel")
         wb = load_workbook("PlanDeRetiroInstrucciones.xlsx")
 
-        logging.debug("Modificando hoja Plan de Retiro")
         ws_plan = wb["Plan de Retiro"]
         ws_plan["C2"] = data.get("edad_actual")
         ws_plan["C3"] = data.get("edad_retiro")
@@ -53,34 +41,36 @@ def modificar():
         else:
             ws_plan["C10"] = None
 
-        logging.debug("Modificando hoja Cómo contactarme")
         ws_contact = wb["Cómo contactarme"]
         ws_contact["C8"].value = data.get("nombre_persona")
 
         img_url = "https://raw.githubusercontent.com/garciabanchs/excel-plan-retiro/main/imagen_circular.png"
-        logging.debug(f"Descargando imagen desde URL: {img_url}")
         response = requests.get(img_url)
-        logging.debug(f"Status descarga imagen: {response.status_code}")
-        if response.status_code == 200:
+
+        print(f"Status descarga imagen: {response.status_code}")
+        print(f"Tamaño bytes: {len(response.content)}")
+        print(f"Content-Type: {response.headers.get('Content-Type')}")
+
+        if response.status_code == 200 and 'image' in response.headers.get('Content-Type', ''):
             img_bytes = BytesIO(response.content)
-            img = Image(img_bytes)
-            ws_contact.add_image(img, "A2")
-            logging.debug("Imagen insertada en Excel")
+            try:
+                img = Image(img_bytes)
+                ws_contact.add_image(img, "A2")
+            except Exception as e_img:
+                logging.error(f"Error al insertar imagen: {e_img}")
         else:
-            logging.error(f"Error descargando imagen, status: {response.status_code}")
+            logging.error("Error descargando imagen o no es tipo imagen.")
 
         output_dir = "downloads"
         os.makedirs(output_dir, exist_ok=True)
         output_file = os.path.join(output_dir, "PlanModificado.xlsx")
-
-        logging.debug("Guardando archivo modificado")
         wb.save(output_file)
 
         return send_file(output_file, as_attachment=True)
 
     except Exception as e:
         traceback_str = traceback.format_exc()
-        logging.error(f"Error en modificar-plan-retiro:\n{traceback_str}")
+        print(traceback_str)
         return jsonify({"error": str(e), "traceback": traceback_str}), 500
 
 if __name__ == "__main__":
