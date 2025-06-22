@@ -2,6 +2,7 @@ from flask import Flask, request, send_file, jsonify
 from flask_cors import CORS
 from openpyxl import load_workbook
 import os
+import traceback
 
 app = Flask(__name__)
 CORS(app)  # Permite CORS
@@ -30,14 +31,17 @@ def modificar():
         ws_contact = wb["Cómo contactarme"]
         ws_contact["C8"] = data.get("nombre_persona")
 
-        output_file = "downloads/PlanModificado.xlsx"
-        os.makedirs("downloads", exist_ok=True)
+        output_dir = "downloads"
+        os.makedirs(output_dir, exist_ok=True)
+        output_file = os.path.join(output_dir, "PlanModificado.xlsx")
         wb.save(output_file)
 
         return send_file(output_file, as_attachment=True)
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        traceback_str = traceback.format_exc()
+        print(traceback_str)  # Se verá en los logs de Render
+        return jsonify({"error": str(e), "traceback": traceback_str}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
