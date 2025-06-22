@@ -16,16 +16,19 @@ def modificar():
         data = request.get_json()
 
         wb = load_workbook("PlanDeRetiroInstrucciones.xlsx")
-        ws = wb["Plan de Retiro"]  # Abrimos la hoja correcta
 
-        # Escribir datos en las celdas específicas:
-        ws["C2"] = data.get("edad_actual")
-        ws["C3"] = data.get("edad_retiro")
-        ws["C4"] = data.get("ingreso_anual")
-        ws["C8"] = data.get("activo_financiero")
-        ws["C10"] = data.get("tasa_interes")
-        ws["C12"] = data.get("fraccion_ahorro")      # Cambia si prefieres otra celda
-        ws["C14"] = data.get("nombre_persona")       # Cambia si prefieres otra celda
+        # Hoja Plan de Retiro para datos financieros
+        ws_plan = wb["Plan de Retiro"]
+        ws_plan["C2"] = data.get("edad_actual")
+        ws_plan["C3"] = data.get("edad_retiro")
+        ws_plan["C4"] = data.get("ingreso_anual")
+        ws_plan["C8"] = data.get("activo_financiero")
+        ws_plan["C10"] = data.get("tasa_interes")
+        ws_plan["C12"] = data.get("fraccion_ahorro")  # Ajusta si quieres otra celda
+
+        # Hoja Cómo contactarme para el nombre
+        ws_contact = wb["Cómo contactarme"]
+        ws_contact["C8"] = data.get("nombre_persona")
 
         output_file = "downloads/PlanModificado.xlsx"
         os.makedirs("downloads", exist_ok=True)
@@ -38,4 +41,3 @@ def modificar():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
-
