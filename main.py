@@ -1,9 +1,6 @@
 from flask import Flask, request, send_file, jsonify
 from flask_cors import CORS
 from openpyxl import load_workbook
-from openpyxl.drawing.image import Image
-import requests
-from io import BytesIO
 import os
 import traceback
 
@@ -43,17 +40,6 @@ def modificar():
 
         ws_contact = wb["Cómo contactarme"]
         ws_contact["C8"].value = data.get("nombre_persona")
-
-        # Imagen desde URL en tu sitio web
-        img_url = "https://angelgarciabanchs.com/wp-content/uploads/2025/06/imagen-circular.png"
-        response = requests.get(img_url)
-        if response.status_code == 200:
-            img_bytes = BytesIO(response.content)
-            img = Image(img_bytes)
-            ws_contact.add_image(img, "A2")
-            app.logger.debug("Imagen insertada correctamente")
-        else:
-            app.logger.warning(f"Error descargando imagen, status: {response.status_code}")
 
         output_dir = "downloads"
         os.makedirs(output_dir, exist_ok=True)
