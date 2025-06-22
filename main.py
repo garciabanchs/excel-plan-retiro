@@ -8,7 +8,15 @@ from io import BytesIO
 import os
 import traceback
 
-logging.basicConfig(level=logging.DEBUG)
+# Configuración de logging a consola y archivo
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s %(levelname)s %(message)s',
+    handlers=[
+        logging.StreamHandler(),
+        logging.FileHandler("error.log", mode='a', encoding='utf-8')
+    ]
+)
 
 app = Flask(__name__)
 CORS(app)
