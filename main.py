@@ -18,6 +18,7 @@ def home():
 def modificar():
     try:
         data = request.get_json()
+        print("Datos recibidos:", data)  # DEBUG
 
         wb = load_workbook("PlanDeRetiroInstrucciones.xlsx")
 
@@ -60,7 +61,7 @@ def modificar():
 
     except Exception as e:
         traceback_str = traceback.format_exc()
-        print(traceback_str)
+        print("Error completo:\n", traceback_str)  # DEBUG en logs
         return jsonify({"error": str(e), "traceback": traceback_str}), 500
 
 if __name__ == "__main__":
