@@ -5,7 +5,7 @@ import os
 import traceback
 
 app = Flask(__name__)
-CORS(app)  # Permite CORS
+CORS(app)
 
 @app.route("/")
 def home():
@@ -18,30 +18,26 @@ def modificar():
 
         wb = load_workbook("PlanDeRetiroInstrucciones.xlsx")
 
-        # Hoja Plan de Retiro para datos financieros
         ws_plan = wb["Plan de Retiro"]
         ws_plan["C2"] = data.get("edad_actual")
         ws_plan["C3"] = data.get("edad_retiro")
         ws_plan["C4"] = data.get("ingreso_anual")
         ws_plan["C5"] = data.get("activo_financiero")
 
-        # Convertir tasa de interés (%) a decimal para Excel (e.g. 8 -> 0.08)
         tasa_interes = data.get("tasa_interes")
         if tasa_interes is not None:
             ws_plan["C8"] = tasa_interes / 100
         else:
             ws_plan["C8"] = None
 
-        # Convertir fracción del ingreso a ahorrar (%) a decimal para Excel (e.g. 12 -> 0.12)
         fraccion_ahorro = data.get("fraccion_ahorro")
         if fraccion_ahorro is not None:
             ws_plan["C10"] = fraccion_ahorro / 100
         else:
             ws_plan["C10"] = None
 
-        # Hoja Cómo contactarme para el nombre (solo modificar C8)
         ws_contact = wb["Cómo contactarme"]
-        ws_contact["C8"] = data.get("nombre_persona")
+        ws_contact["C8"].value = data.get("nombre_persona")  # usar .value para no borrar imagen
 
         output_dir = "downloads"
         os.makedirs(output_dir, exist_ok=True)
