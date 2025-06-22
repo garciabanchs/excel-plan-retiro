@@ -23,7 +23,7 @@ def modificar():
         ws_plan["C2"] = data.get("edad_actual")
         ws_plan["C3"] = data.get("edad_retiro")
         ws_plan["C4"] = data.get("ingreso_anual")
-        ws_plan["C8"] = data.get("activo_financiero")
+        ws_plan["C5"] = data.get("activo_financiero")
 
         # Ajustar tasa de interés real (de % a decimal)
         tasa_interes = data.get("tasa_interes")
