@@ -6,7 +6,6 @@ import requests
 from io import BytesIO
 import os
 import traceback
-import logging
 
 app = Flask(__name__)
 CORS(app)
@@ -19,9 +18,10 @@ def home():
 def modificar():
     try:
         data = request.get_json()
-        logging.debug(f"Datos recibidos: {data}")
+        app.logger.debug(f"Datos recibidos: {data}")
 
         wb = load_workbook("PlanDeRetiroInstrucciones.xlsx")
+        app.logger.debug("Archivo Excel cargado")
 
         ws_plan = wb["Plan de Retiro"]
         ws_plan["C2"] = data.get("edad_actual")
@@ -44,33 +44,28 @@ def modificar():
         ws_contact = wb["Cómo contactarme"]
         ws_contact["C8"].value = data.get("nombre_persona")
 
-        img_url = "https://raw.githubusercontent.com/garciabanchs/excel-plan-retiro/main/imagen_circular.png"
+        # Imagen desde URL en tu sitio web
+        img_url = "https://angelgarciabanchs.com/wp-content/uploads/2025/06/imagen-circular.png"
         response = requests.get(img_url)
-
-        print(f"Status descarga imagen: {response.status_code}")
-        print(f"Tamaño bytes: {len(response.content)}")
-        print(f"Content-Type: {response.headers.get('Content-Type')}")
-
-        if response.status_code == 200 and 'image' in response.headers.get('Content-Type', ''):
+        if response.status_code == 200:
             img_bytes = BytesIO(response.content)
-            try:
-                img = Image(img_bytes)
-                ws_contact.add_image(img, "A2")
-            except Exception as e_img:
-                logging.error(f"Error al insertar imagen: {e_img}")
+            img = Image(img_bytes)
+            ws_contact.add_image(img, "A2")
+            app.logger.debug("Imagen insertada correctamente")
         else:
-            logging.error("Error descargando imagen o no es tipo imagen.")
+            app.logger.warning(f"Error descargando imagen, status: {response.status_code}")
 
         output_dir = "downloads"
         os.makedirs(output_dir, exist_ok=True)
         output_file = os.path.join(output_dir, "PlanModificado.xlsx")
         wb.save(output_file)
+        app.logger.debug("Archivo Excel guardado")
 
         return send_file(output_file, as_attachment=True)
 
     except Exception as e:
         traceback_str = traceback.format_exc()
-        print(traceback_str)
+        app.logger.error(f"Error en modificar-plan-retiro:\n{traceback_str}")
         return jsonify({"error": str(e), "traceback": traceback_str}), 500
 
 if __name__ == "__main__":
