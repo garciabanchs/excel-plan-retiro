@@ -1,6 +1,9 @@
 from flask import Flask, request, send_file, jsonify
 from flask_cors import CORS
 from openpyxl import load_workbook
+from openpyxl.drawing.image import Image
+import requests
+from io import BytesIO
 import os
 import traceback
 
@@ -37,7 +40,14 @@ def modificar():
             ws_plan["C10"] = None
 
         ws_contact = wb["Cómo contactarme"]
-        ws_contact["C8"].value = data.get("nombre_persona")  # usar .value para no borrar imagen
+        ws_contact["C8"].value = data.get("nombre_persona")
+
+        # Descargar imagen desde URL e insertar en B2
+        img_url = "https://angelgarciabanchs.com/wp-content/uploads/2025/06/imagen-circular.png"
+        response = requests.get(img_url)
+        img_bytes = BytesIO(response.content)
+        img = Image(img_bytes)
+        ws_contact.add_image(img, "B2")
 
         output_dir = "downloads"
         os.makedirs(output_dir, exist_ok=True)
@@ -53,3 +63,4 @@ def modificar():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
+
