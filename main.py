@@ -42,12 +42,15 @@ def modificar():
         ws_contact = wb["Cómo contactarme"]
         ws_contact["C8"].value = data.get("nombre_persona")
 
-        # Descargar imagen desde URL e insertar en B2
-        img_url = "https://angelgarciabanchs.com/wp-content/uploads/2025/06/imagen-circular.png"
+        # Imagen desde URL raw en GitHub (sin espacios)
+        img_url = "https://raw.githubusercontent.com/garciabanchs/excel-plan-retiro/main/imagen_circular.png"
         response = requests.get(img_url)
-        img_bytes = BytesIO(response.content)
-        img = Image(img_bytes)
-        ws_contact.add_image(img, "B2")
+        if response.status_code == 200:
+            img_bytes = BytesIO(response.content)
+            img = Image(img_bytes)
+            ws_contact.add_image(img, "A2")
+        else:
+            print(f"Error descargando imagen, status: {response.status_code}")
 
         output_dir = "downloads"
         os.makedirs(output_dir, exist_ok=True)
