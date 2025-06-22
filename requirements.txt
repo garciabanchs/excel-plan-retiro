@@ -1,4 +1,4 @@
-flask-cors
 flask
+flask-cors
 openpyxl
-requests 
+requests
